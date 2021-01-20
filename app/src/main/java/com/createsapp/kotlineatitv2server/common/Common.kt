@@ -1,10 +1,12 @@
 package com.createsapp.kotlineatitv2server.common
 
 import com.createsapp.kotlineatitv2server.model.CategoryModel
+import com.createsapp.kotlineatitv2server.model.FoodModel
 import com.createsapp.kotlineatitv2server.model.ServerUserModel
 
 object Common {
 
+    var foodSelected: FoodModel? = null
     val FULL_WIDTH_COLUMN: Int = 1
     val DEFAULT_COLUM_COUNT: Int = 0
     var categorySelected: CategoryModel?=null
