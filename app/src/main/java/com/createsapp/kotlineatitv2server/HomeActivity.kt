@@ -2,6 +2,7 @@ package com.createsapp.kotlineatitv2server
 
 import android.os.Bundle
 import android.view.Menu
+import android.widget.Toast
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
@@ -15,12 +16,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.NavController
 import com.createsapp.kotlineatitv2server.eventbus.CategoryClick
+import com.createsapp.kotlineatitv2server.eventbus.ChangeMenuClick
+import com.createsapp.kotlineatitv2server.eventbus.ToastEvent
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
 class HomeActivity : AppCompatActivity() {
 
+    private var menuclick: Int = -1
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navController: NavController
@@ -40,7 +44,7 @@ class HomeActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_category, R.id.nav_food_list, R.id.nav_slideshow
+                R.id.nav_category, R.id.nav_food_list
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -71,7 +75,43 @@ class HomeActivity : AppCompatActivity() {
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     fun onCategoryClick(event: CategoryClick) {
         if (event.isSuccess)
-            navController.navigate(R.id.nav_food_list)
+        {
+            if (menuclick != R.id.nav_food_list)
+            {
+                navController.navigate(R.id.nav_food_list)
+                menuclick = R.id.nav_food_list
+            }
+        }
+
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    fun onChangeMenuEvent(event: ChangeMenuClick)
+    {
+
+        if (!event.isFromFoodList)
+        {
+            //Clear
+            navController!!.popBackStack(R.id.nav_category, true)
+            navController!!.navigate(R.id.nav_category)
+        }
+
+        menuclick = -1
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    fun onToastEvent(event: ToastEvent)
+    {
+        
+        if (event.isUpdate)
+        {
+            Toast.makeText(this, "Update Success", Toast.LENGTH_SHORT).show()
+        } else 
+        {
+            Toast.makeText(this, "Delete Success", Toast.LENGTH_SHORT).show()
+        }
+
+        EventBus.getDefault().postSticky(ChangeMenuClick(event.isBackFromFoodList))
     }
 
 }

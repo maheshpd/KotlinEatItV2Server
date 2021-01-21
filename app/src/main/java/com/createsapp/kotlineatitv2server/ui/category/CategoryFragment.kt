@@ -29,6 +29,7 @@ import com.createsapp.kotlineatitv2server.callback.IMyButtonCallback
 import com.createsapp.kotlineatitv2server.common.Common
 import com.createsapp.kotlineatitv2server.common.MySwipeHelper
 import com.createsapp.kotlineatitv2server.common.SpacesItemDecoration
+import com.createsapp.kotlineatitv2server.eventbus.ToastEvent
 import com.createsapp.kotlineatitv2server.model.CategoryModel
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -135,6 +136,7 @@ class CategoryFragment : Fragment() {
             val updateData = HashMap<String, Any>()
             updateData["name"] = edt_category_name.text.toString()
             if (imageUri != null) {
+
                 dialog.setMessage("Uploading...")
                 dialog.show()
 
@@ -178,7 +180,7 @@ class CategoryFragment : Fragment() {
             }
             .addOnCompleteListener { task ->
                 categoryViewModel!!.loadCategory()
-                Toast.makeText(context, "Update Success", Toast.LENGTH_SHORT).show()
+                EventBus.getDefault().postSticky(ToastEvent(true, false))
             }
     }
 
