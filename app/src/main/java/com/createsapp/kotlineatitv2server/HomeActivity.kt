@@ -1,5 +1,6 @@
 package com.createsapp.kotlineatitv2server
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.widget.Toast
@@ -15,9 +16,11 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.NavController
+import com.createsapp.kotlineatitv2server.common.Common
 import com.createsapp.kotlineatitv2server.eventbus.CategoryClick
 import com.createsapp.kotlineatitv2server.eventbus.ChangeMenuClick
 import com.createsapp.kotlineatitv2server.eventbus.ToastEvent
+import com.google.firebase.auth.FirebaseAuth
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -49,6 +52,44 @@ class HomeActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        navView.setNavigationItemSelectedListener { item ->
+
+            item.isChecked = true
+            drawerLayout!!.closeDrawers()
+
+            when (item.itemId) {
+                R.id.nav_sign_out -> {
+                    signOut()
+                }
+                R.id.nav_category -> {
+                    if (menuclick != item.itemId)
+                        navController.navigate(R.id.nav_category)
+                }
+
+            }
+
+            menuclick = item.itemId
+            true
+        }
+    }
+
+    private fun signOut() {
+        val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+        builder.setTitle("Sign out")
+            .setMessage("Doy you really want to exit?")
+            .setNegativeButton("CANCEL") { dialog, _ -> dialog.dismiss() }
+            .setPositiveButton("OK") { _, _ ->
+                Common.foodSelected = null
+                Common.categorySelected = null
+                Common.currentServerUser = null
+                FirebaseAuth.getInstance().signOut()
+
+                val intent = Intent(this@HomeActivity, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
+            }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

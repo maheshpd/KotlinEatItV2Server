@@ -165,7 +165,7 @@ class FoodListFragment : Fragment() {
         //Set data
         edt_food_name.setText(StringBuilder("").append(Common.categorySelected!!.foods!![pos].name))
         edt_food_price.setText(StringBuilder("").append(Common.categorySelected!!.foods!![pos].price))
-        edt_food_price.setText(StringBuilder("").append(Common.categorySelected!!.foods!![pos].description))
+        edt_food_description.setText(StringBuilder("").append(Common.categorySelected!!.foods!![pos].description))
         Glide.with(requireContext()).load(Common.categorySelected!!.foods!![pos].image).into(img_food!!)
 
         //Set Event
@@ -209,6 +209,7 @@ class FoodListFragment : Fragment() {
                     .addOnSuccessListener { taskSnapshot ->
                         dialogInterface.dismiss()
                         imageFolder.downloadUrl.addOnSuccessListener { uri ->
+                            dialog.dismiss()
                             updateFood.image = uri.toString()
                             Common.categorySelected!!.foods!![pos] = updateFood
                             updateFood(Common.categorySelected!!.foods!!,false)
