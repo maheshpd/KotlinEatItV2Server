@@ -58,6 +58,7 @@ class SizeAddonEditActivity : AppCompatActivity() {
     }
 
     private fun init() {
+        //comment
         setSupportActionBar(tool_bar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
