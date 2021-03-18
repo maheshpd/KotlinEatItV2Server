@@ -15,4 +15,6 @@ class FoodModel {
 
     var userSelectedAddon: MutableList<AddonModel>?= null
     var userSelectedSize: SizeModel?= null
+
+    var positionInList: Int = -1
 }
