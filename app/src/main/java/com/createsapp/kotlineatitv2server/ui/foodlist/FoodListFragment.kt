@@ -159,7 +159,7 @@ class FoodListFragment : Fragment() {
                         "Size",
                         30,
                         0,
-                        Color.parseColor("#12005a"),
+                        Color.parseColor("#12005e"),
                         object : IMyButtonCallback {
                             override fun onClick(pos: Int) {
 

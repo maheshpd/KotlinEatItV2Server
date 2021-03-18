@@ -52,7 +52,7 @@ class SizeAddonEditActivity : AppCompatActivity() {
         btn_edit = findViewById(R.id.btn_edit)
         btn_create = findViewById(R.id.btn_create)
 
-
+        //Comment
         recycler_addon_size = findViewById(R.id.recycler_addon_size)
         init();
     }
@@ -132,7 +132,7 @@ class SizeAddonEditActivity : AppCompatActivity() {
                 {
                     val builder = AlertDialog.Builder(this)
                         .setTitle("Cancel?")
-                        .setMessage("Do you really want to close without saveing?")
+                        .setMessage("Do you really want to close without saving?")
                         .setNegativeButton("CANCEL"){dialogInterface, _ -> dialogInterface.dismiss()}
                         .setPositiveButton("OK"){dialogInterface, i ->
                             needSave = false
