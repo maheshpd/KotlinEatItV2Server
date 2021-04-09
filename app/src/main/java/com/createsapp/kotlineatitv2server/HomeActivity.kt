@@ -3,6 +3,8 @@ package com.createsapp.kotlineatitv2server
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -31,7 +33,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navController: NavController
-    private lateinit var navView:NavigationView
+    private lateinit var navView: NavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +64,10 @@ class HomeActivity : AppCompatActivity() {
                 R.id.nav_sign_out -> {
                     signOut()
                 }
+
+                R.id.nav_order -> {
+                    navController.navigate(R.id.nav_order)
+                }
                 R.id.nav_category -> {
                     if (menuclick != item.itemId)
                         navController.navigate(R.id.nav_category)
@@ -72,6 +78,11 @@ class HomeActivity : AppCompatActivity() {
             menuclick = item.itemId
             true
         }
+
+        //View
+        val headerView = navView.getHeaderView(0)
+        val txt_user = headerView.findViewById<View>(R.id.txt_user) as TextView
+        Common.setSpanString("Hey", Common.currentServerUser!!.name, txt_user)
     }
 
     private fun signOut() {
@@ -115,10 +126,8 @@ class HomeActivity : AppCompatActivity() {
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     fun onCategoryClick(event: CategoryClick) {
-        if (event.isSuccess)
-        {
-            if (menuclick != R.id.nav_food_list)
-            {
+        if (event.isSuccess) {
+            if (menuclick != R.id.nav_food_list) {
                 navController.navigate(R.id.nav_food_list)
                 menuclick = R.id.nav_food_list
             }
@@ -127,11 +136,9 @@ class HomeActivity : AppCompatActivity() {
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    fun onChangeMenuEvent(event: ChangeMenuClick)
-    {
+    fun onChangeMenuEvent(event: ChangeMenuClick) {
 
-        if (!event.isFromFoodList)
-        {
+        if (!event.isFromFoodList) {
             //Clear
             navController!!.popBackStack(R.id.nav_category, true)
             navController!!.navigate(R.id.nav_category)
@@ -141,14 +148,11 @@ class HomeActivity : AppCompatActivity() {
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    fun onToastEvent(event: ToastEvent)
-    {
-        
-        if (event.isUpdate)
-        {
+    fun onToastEvent(event: ToastEvent) {
+
+        if (event.isUpdate) {
             Toast.makeText(this, "Update Success", Toast.LENGTH_SHORT).show()
-        } else 
-        {
+        } else {
             Toast.makeText(this, "Delete Success", Toast.LENGTH_SHORT).show()
         }
 
