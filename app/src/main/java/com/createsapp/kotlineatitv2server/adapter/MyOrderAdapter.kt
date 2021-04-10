@@ -65,7 +65,7 @@ class MyOrderAdapter(
         Common.setSpanStringColor("Order date ", Common.convertStatusToString(orderList[position].orderStatus),
             holder.txt_order_status, Color.parseColor("#005758"))
 
-        Common.setSpanStringColor("Num of items ",if(orderList[position].cartItemList != null) "0"
+        Common.setSpanStringColor("Num of items ",if(orderList[position].cartItemList == null) "0"
             else orderList[position].cartItemList!!.size.toString(),
             holder.txt_num_item, Color.parseColor("#00574B"))
 

@@ -27,4 +27,5 @@
     <string name="action_clear_cart">Clear Cart</string>
     <string name="search">Search</string>
     <string name="menu_order">Orders</string>
+    <string name="filter">Filter</string>
 </resources>
