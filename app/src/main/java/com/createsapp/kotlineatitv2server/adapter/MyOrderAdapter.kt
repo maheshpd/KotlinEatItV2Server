@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat
 
 class MyOrderAdapter(
     internal var context: Context,
-    internal var orderList: List<OrderModel>
+    internal var orderList: MutableList<OrderModel>
 ) : RecyclerView.Adapter<MyOrderAdapter.MyViewHolder>() {
 
     lateinit var simpleDataFormat: SimpleDateFormat
@@ -59,24 +59,40 @@ class MyOrderAdapter(
         Glide.with(context).load(orderList[position].cartItemList!![0].foodImage)
             .into(holder.img_food_image!!)
         holder.txt_order_number!!.text = orderList[position].key
-        Common.setSpanStringColor("Order date ", simpleDataFormat.format(orderList[position].createDate),
-            holder.txt_time, Color.parseColor("#333639"))
+        Common.setSpanStringColor(
+            "Order date ", simpleDataFormat.format(orderList[position].createDate),
+            holder.txt_time, Color.parseColor("#333639")
+        )
 
-        Common.setSpanStringColor("Order date ", Common.convertStatusToString(orderList[position].orderStatus),
-            holder.txt_order_status, Color.parseColor("#005758"))
+        Common.setSpanStringColor(
+            "Order date ", Common.convertStatusToString(orderList[position].orderStatus),
+            holder.txt_order_status, Color.parseColor("#005758")
+        )
 
-        Common.setSpanStringColor("Num of items ",if(orderList[position].cartItemList == null) "0"
+        Common.setSpanStringColor(
+            "Num of items ", if (orderList[position].cartItemList == null) "0"
             else orderList[position].cartItemList!!.size.toString(),
-            holder.txt_num_item, Color.parseColor("#00574B"))
+            holder.txt_num_item, Color.parseColor("#00574B")
+        )
 
-        Common.setSpanStringColor("Name ",orderList[position].userName,
-            holder.txt_name, Color.parseColor("#006061"))
+        Common.setSpanStringColor(
+            "Name ", orderList[position].userName,
+            holder.txt_name, Color.parseColor("#006061")
+        )
 
 
     }
 
     override fun getItemCount(): Int {
         return orderList.size
+    }
+
+    fun getItemAtPosition(pos: Int): OrderModel {
+        return orderList[pos]
+    }
+
+    fun removeItem(pos: Int) {
+        orderList.removeAt(pos)
     }
 
 }
