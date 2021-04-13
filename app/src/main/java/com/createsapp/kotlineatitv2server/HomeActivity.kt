@@ -66,11 +66,20 @@ class HomeActivity : AppCompatActivity() {
                 }
 
                 R.id.nav_order -> {
-                    navController.navigate(R.id.nav_order)
+                    if (menuclick != item.itemId)
+                    {
+                        navController.popBackStack() //Clear back stack
+                        navController.navigate(R.id.nav_order)
+                    }
+
                 }
                 R.id.nav_category -> {
                     if (menuclick != item.itemId)
+                    {
+                        navController.popBackStack() // clear back stack
                         navController.navigate(R.id.nav_category)
+                    }
+
                 }
 
             }
@@ -83,6 +92,8 @@ class HomeActivity : AppCompatActivity() {
         val headerView = navView.getHeaderView(0)
         val txt_user = headerView.findViewById<View>(R.id.txt_user) as TextView
         Common.setSpanString("Hey", Common.currentServerUser!!.name, txt_user)
+
+        menuclick = R.id.nav_category // Default
     }
 
     private fun signOut() {
