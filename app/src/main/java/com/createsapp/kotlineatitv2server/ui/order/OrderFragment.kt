@@ -32,7 +32,10 @@ import com.createsapp.kotlineatitv2server.common.MySwipeHelper
 import com.createsapp.kotlineatitv2server.eventbus.AddonSizeEditEvent
 import com.createsapp.kotlineatitv2server.eventbus.ChangeMenuClick
 import com.createsapp.kotlineatitv2server.eventbus.LoadOrderEvent
+import com.createsapp.kotlineatitv2server.model.FCMSendData
 import com.createsapp.kotlineatitv2server.model.OrderModel
+import com.createsapp.kotlineatitv2server.model.TokenModel
+import com.createsapp.kotlineatitv2server.remote.IFCMService
 import com.createsapp.kotlineatitv2server.services.MyFCMService
 import com.createsapp.kotlineatitv2server.services.RetrofitFCMClient
 import com.google.firebase.database.DataSnapshot
@@ -46,7 +49,9 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import dmax.dialog.SpotsDialog
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.layout_dialog_shipping.*
 import org.greenrobot.eventbus.EventBus
@@ -57,7 +62,7 @@ import java.lang.StringBuilder
 class OrderFragment : Fragment() {
 
     private val compositeDisposable = CompositeDisposable()
-    lateinit var ifcmService: MyFCMService
+    lateinit var ifcmService: IFCMService
 
     lateinit var recycler_order: RecyclerView
     lateinit var layoutAnimationController: LayoutAnimationController
@@ -95,7 +100,7 @@ class OrderFragment : Fragment() {
 
     private fun initViews(root: View?) {
 
-        ifcmService = RetrofitFCMClient.getInstance().create(MyFCMService::class.java)
+        ifcmService = RetrofitFCMClient.getInstance().create(IFCMService::class.java)
 
         setHasOptionsMenu(true)
 
@@ -384,11 +389,53 @@ class OrderFragment : Fragment() {
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 if (snapshot.exists()) {
 
-                                    val tokenModel = snapshot.getValue()
+                                    val tokenModel = snapshot.getValue(TokenModel::class.java)
+                                    val notiData = HashMap<String, String>()
+                                    notiData.put(Common.NOTI_TITLE, "Your order was update")
+                                    notiData.put(
+                                        Common.NOTI_CONTENT, StringBuilder("Your order ")
+                                            .append(orderModel.key)
+                                            .append(" was update to ")
+                                            .append(Common.convertStatusToString(status)).toString()
+                                    )
+
+                                    val sendData = FCMSendData(tokenModel!!.token!!, notiData)
+
+                                    compositeDisposable.add(
+                                        ifcmService.sendNotification(sendData)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe({ fcmResponse ->
+                                                dialog.dismiss()
+                                                if (fcmResponse.success == 1) {
+                                                    Toast.makeText(
+                                                        requireContext(),
+                                                        "Update order success",
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                        .show()
+                                                } else {
+                                                    Toast.makeText(
+                                                        requireContext(),
+                                                        "Failed to send notification",
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                        .show()
+                                                }
+                                            }, { t ->
+                                                dialog.dismiss()
+                                                Toast.makeText(
+                                                    requireContext(),
+                                                    "" + t.message,
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            })
+                                    )
 
                                 } else {
                                     dialog.dismiss()
-                                    Toast.makeText(context, "Token not found", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Token not found", Toast.LENGTH_SHORT)
+                                        .show()
                                 }
                             }
 
@@ -403,8 +450,6 @@ class OrderFragment : Fragment() {
                     adapter!!.removeItem(pos)
                     adapter!!.notifyItemRemoved(pos)
                     updateTextCounter()
-                    Toast.makeText(requireContext(), "Update Order success!", Toast.LENGTH_SHORT)
-                        .show()
                 }
         } else {
             Toast.makeText(
