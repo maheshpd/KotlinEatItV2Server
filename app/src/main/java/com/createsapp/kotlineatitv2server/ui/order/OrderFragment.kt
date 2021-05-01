@@ -33,13 +33,20 @@ import com.createsapp.kotlineatitv2server.eventbus.AddonSizeEditEvent
 import com.createsapp.kotlineatitv2server.eventbus.ChangeMenuClick
 import com.createsapp.kotlineatitv2server.eventbus.LoadOrderEvent
 import com.createsapp.kotlineatitv2server.model.OrderModel
+import com.createsapp.kotlineatitv2server.services.MyFCMService
+import com.createsapp.kotlineatitv2server.services.RetrofitFCMClient
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
+import dmax.dialog.SpotsDialog
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.layout_dialog_shipping.*
 import org.greenrobot.eventbus.EventBus
@@ -48,6 +55,9 @@ import org.greenrobot.eventbus.ThreadMode
 import java.lang.StringBuilder
 
 class OrderFragment : Fragment() {
+
+    private val compositeDisposable = CompositeDisposable()
+    lateinit var ifcmService: MyFCMService
 
     lateinit var recycler_order: RecyclerView
     lateinit var layoutAnimationController: LayoutAnimationController
@@ -84,6 +94,8 @@ class OrderFragment : Fragment() {
     }
 
     private fun initViews(root: View?) {
+
+        ifcmService = RetrofitFCMClient.getInstance().create(MyFCMService::class.java)
 
         setHasOptionsMenu(true)
 
@@ -360,6 +372,34 @@ class OrderFragment : Fragment() {
                         .show()
                 }
                 .addOnSuccessListener {
+
+                    val dialog = SpotsDialog.Builder().setContext(requireContext()).setCancelable(false).build()
+                    dialog.show()
+
+                    //Load token
+                    FirebaseDatabase.getInstance()
+                        .getReference(Common.TOKEN_REF)
+                        .child(orderModel.userId!!)
+                        .addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if (snapshot.exists()) {
+
+                                    val tokenModel = snapshot.getValue()
+
+                                } else {
+                                    dialog.dismiss()
+                                    Toast.makeText(context, "Token not found", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                                dialog.dismiss()
+                                Toast.makeText(context, "" + error.message, Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+
+                        })
+
                     adapter!!.removeItem(pos)
                     adapter!!.notifyItemRemoved(pos)
                     updateTextCounter()
@@ -408,6 +448,9 @@ class OrderFragment : Fragment() {
             EventBus.getDefault().removeStickyEvent(LoadOrderEvent::class.java)
         if (EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().unregister(this)
+
+        compositeDisposable.clear()
+
 
         super.onStop()
 

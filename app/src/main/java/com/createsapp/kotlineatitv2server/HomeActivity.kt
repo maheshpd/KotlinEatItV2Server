@@ -23,6 +23,7 @@ import com.createsapp.kotlineatitv2server.eventbus.CategoryClick
 import com.createsapp.kotlineatitv2server.eventbus.ChangeMenuClick
 import com.createsapp.kotlineatitv2server.eventbus.ToastEvent
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.FirebaseMessaging
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -40,6 +41,9 @@ class HomeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_home)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+
+        subscribeToTopic(Common.getNewOrderTopic())
 
 
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -94,6 +98,19 @@ class HomeActivity : AppCompatActivity() {
         Common.setSpanString("Hey", Common.currentServerUser!!.name, txt_user)
 
         menuclick = R.id.nav_category // Default
+    }
+
+    private fun subscribeToTopic(newOrderTopic: String) {
+        FirebaseMessaging.getInstance()
+            .subscribeToTopic(newOrderTopic)
+            .addOnFailureListener {
+                message ->
+                Toast.makeText(this@HomeActivity, ""+message.message, Toast.LENGTH_SHORT).show()
+            }
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful)
+                    Toast.makeText(this@HomeActivity, "Subscribe topic failed", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun signOut() {

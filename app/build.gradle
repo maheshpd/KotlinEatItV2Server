@@ -67,4 +67,17 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage:19.1.0'
 
     implementation 'com.karumi:dexter:6.0.0'
+
+    implementation 'com.google.firebase:firebase-messaging:20.0.0'
+
+    //Retrofit2
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
+    //Rxjava
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.20'
+
+    //Spots Dialog
+    implementation 'com.github.d-max:spots-dialog:1.1@aar'
 }
